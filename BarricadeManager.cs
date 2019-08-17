@@ -50,7 +50,203 @@ namespace practise
                 BarricadeManager.regions = value;
             }
         }
+        public static void load(string path)
+        {
+            bool flag = false;
+            //if (LevelSavedata.fileExists("/Barricades.dat") && Level.info.type == ELevelType.SURVIVAL)
+            //{
+            River river = new River(path, true, false, true);
+            BarricadeManager.version = river.readByte();
+            BarricadeManager.serverActiveDate = river.readUInt32();
+            if (BarricadeManager.version > (byte)0)
+            {
+                for (byte index1 = 0; (int)index1 < (int)Regions.WORLD_SIZE; ++index1)
+                {
+                    for (byte index2 = 0; (int)index2 < (int)Regions.WORLD_SIZE; ++index2)
+                    {
+                        BarricadeRegion region = BarricadeManager.regions[(int)index1, (int)index2];
+                        //BarricadeManager.loadRegion(BarricadeManager.version, river, region);
+                    }
+                }
+                if (BarricadeManager.version > (byte)1)
+                {
+                    if (BarricadeManager.version > (byte)13)
+                    {
+                        ushort num = river.readUInt16();
+                        for (ushort index = 0; (int)index < (int)num; ++index)
+                        {
+                            uint instanceID = river.readUInt32();
+                            BarricadeRegion region = BarricadeManager.getRegionFromVehicle(VehicleManager.getVehicle(instanceID));
+                            if (region == null)
+                            {
+                                CommandWindow.LogWarning((object)string.Format("Barricades associated with missing vehicle instance ID '{0}' were lost", (object)instanceID));
+                                region = BarricadeManager.regions[0, 0];
+                            }
+                            //BarricadeManager.loadRegion(BarricadeManager.version, river, region);
+                        }
+                    }
+                    else
+                    {
+                        ushort num = (ushort)Mathf.Min((int)river.readUInt16(), BarricadeManager.plants.Count);
+                        for (int index = 0; index < (int)num; ++index)
+                        {
+                            BarricadeRegion plant = BarricadeManager.plants[index];
+                            //BarricadeManager.loadRegion(BarricadeManager.version, river, plant);
+                        }
+                    }
+                }
+            }
 
+            //if (BarricadeManager.version < (byte)11)
+            //    flag = true;
+            //}
+            //else
+            //    flag = true;
+            //if (flag && LevelObjects.buildables != null)
+            //{
+            //    for (byte index1 = 0; (int)index1 < (int)Regions.WORLD_SIZE; ++index1)
+            //    {
+            //        for (byte index2 = 0; (int)index2 < (int)Regions.WORLD_SIZE; ++index2)
+            //        {
+            //            List<LevelBuildableObject> buildable = LevelObjects.buildables[(int)index1, (int)index2];
+            //            if (buildable != null && buildable.Count != 0)
+            //            {
+            //                BarricadeRegion region = BarricadeManager.regions[(int)index1, (int)index2];
+            //                for (int index3 = 0; index3 < buildable.Count; ++index3)
+            //                {
+            //                    LevelBuildableObject levelBuildableObject = buildable[index3];
+            //                    if (levelBuildableObject != null)
+            //                    {
+            //                        ItemBarricadeAsset asset = levelBuildableObject.asset as ItemBarricadeAsset;
+            //                        if (asset != null)
+            //                        {
+            //                            Vector3 eulerAngles = levelBuildableObject.rotation.eulerAngles;
+            //                            byte newAngle_X = MeasurementTool.angleToByte((float)(Mathf.RoundToInt(eulerAngles.x / 2f) * 2));
+            //                            byte newAngle_Y = MeasurementTool.angleToByte((float)(Mathf.RoundToInt(eulerAngles.y / 2f) * 2));
+            //                            byte newAngle_Z = MeasurementTool.angleToByte((float)(Mathf.RoundToInt(eulerAngles.z / 2f) * 2));
+            //                            Barricade newBarricade = new Barricade(asset.id, asset.health, asset.getState(), asset);
+            //                            BarricadeData barricadeData = new BarricadeData(newBarricade, levelBuildableObject.point, newAngle_X, newAngle_Y, newAngle_Z, 0UL, 0UL, uint.MaxValue);
+            //                            region.barricades.Add(barricadeData);
+            //                            //BarricadeManager.manager.spawnBarricade(region, newBarricade.id, newBarricade.state, barricadeData.point, barricadeData.angle_x, barricadeData.angle_y, barricadeData.angle_z, (byte)Mathf.RoundToInt((float)((double)newBarricade.health / (double)asset.health * 100.0)), 0UL, 0UL, ++BarricadeManager.instanceCount);
+            //                        }
+            //                    }
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
+            Level.isLoadingBarricades = false;
+        }
+        public static void loadRegion(River river)
+        {
+            Console.WriteLine("begin");
+            ushort num1 = river.readUInt16();
+            for (ushort index = 0; (int)index < (int)num1; ++index)
+            {
+                ushort num2 = river.readUInt16();
+                Console.WriteLine();
+                Console.WriteLine($"barricade ID: {num2}");
+                ushort newHealth = river.readUInt16();
+                byte[] numArray = river.readBytes();
+                foreach (var item in numArray)
+                {
+                    Console.WriteLine($"state: {item}");
+                }
+                Console.WriteLine();
+            Console.WriteLine("end");
+            Vector3 vector3 = river.readSingleVector3();
+            byte num3 = 0;
+            if (version > (byte)2)
+                num3 = river.readByte();
+            byte num4 = river.readByte();
+            byte num5 = 0;
+            if (version > (byte)3)
+                num5 = river.readByte();
+            ulong num6 = 0;
+            ulong num7 = 0;
+            if (version > (byte)4)
+            {
+                num6 = river.readUInt64();
+                num7 = river.readUInt64();
+            }
+            uint newObjActiveDate = river.readUInt32();
+                newObjActiveDate = 123123213;
+            //ItemBarricadeAsset itemBarricadeAsset;
+            
+            
+            }
+        }
+        public static void save(string path)
+        {
+            River river = new River(path, true, false, true);
+            river.writeByte(BarricadeManager.SAVEDATA_VERSION);
+            river.writeUInt32(Provider.time);
+            for (byte index1 = 0; (int)index1 < (int)Regions.WORLD_SIZE; ++index1)
+            {
+                for (byte index2 = 0; (int)index2 < (int)Regions.WORLD_SIZE; ++index2)
+                {
+                    BarricadeRegion region = BarricadeManager.regions[(int)index1, (int)index2];
+                    BarricadeManager.saveRegion(river, region);
+                }
+            }
+            ushort num = 0;
+            for (ushort plant = 0; (int)plant < BarricadeManager.plants.Count; ++plant)
+            {
+                InteractableVehicle vehicleFromPlant = BarricadeManager.getVehicleFromPlant(plant);
+                if ((UnityEngine.Object)vehicleFromPlant != (UnityEngine.Object)null && !vehicleFromPlant.isAutoClearable)
+                    ++num;
+            }
+            river.writeUInt16(num);
+            for (int index = 0; index < BarricadeManager.plants.Count; ++index)
+            {
+                InteractableVehicle vehicleFromPlant = BarricadeManager.getVehicleFromPlant((ushort)index);
+                if ((UnityEngine.Object)vehicleFromPlant != (UnityEngine.Object)null && !vehicleFromPlant.isAutoClearable)
+                {
+                    river.writeUInt32(vehicleFromPlant.instanceID);
+                    BarricadeManager.saveRegion(river, BarricadeManager.plants[index]);
+                }
+            }
+            river.closeRiver();
+        }
+        private static void saveRegion(River river, BarricadeRegion region)
+        {
+            uint time = Provider.time;
+            ushort num = 0;
+            for (ushort index = 0; (int)index < region.barricades.Count; ++index)
+            {
+                BarricadeData barricade = region.barricades[(int)index];
+                if ((!Dedicator.isDedicated || Provider.modeConfigData.Barricades.Decay_Time == 0U || (time < barricade.objActiveDate || time - barricade.objActiveDate < Provider.modeConfigData.Barricades.Decay_Time)) && barricade.barricade.asset.isSaveable)
+                    ++num;
+            }
+            river.writeUInt16(num);
+            for (ushort index = 0; (int)index < region.barricades.Count; ++index)
+            {
+                BarricadeData barricade = region.barricades[(int)index];
+                river.writeUInt16(barricade.barricade.id);
+                river.writeUInt16(barricade.barricade.health);
+                river.writeBytes(barricade.barricade.state);
+                river.writeSingleVector3(barricade.point);
+                river.writeByte(barricade.angle_x);
+                river.writeByte(barricade.angle_y);
+                river.writeByte(barricade.angle_z);
+                river.writeUInt64(barricade.owner);
+                river.writeUInt64(barricade.group);
+                river.writeUInt32(barricade.objActiveDate);
+                //if ((!Dedicator.isDedicated || Provider.modeConfigData.Barricades.Decay_Time == 0U || (time < barricade.objActiveDate || time - barricade.objActiveDate < Provider.modeConfigData.Barricades.Decay_Time)) && barricade.barricade.asset.isSaveable)
+                //{
+                //    river.writeUInt16(barricade.barricade.id);
+                //    river.writeUInt16(barricade.barricade.health);
+                //    river.writeBytes(barricade.barricade.state);
+                //    river.writeSingleVector3(barricade.point);
+                //    river.writeByte(barricade.angle_x);
+                //    river.writeByte(barricade.angle_y);
+                //    river.writeByte(barricade.angle_z);
+                //    river.writeUInt64(barricade.owner);
+                //    river.writeUInt64(barricade.group);
+                //    river.writeUInt32(barricade.objActiveDate);
+                //}
+            }
+        }
         public static List<BarricadeRegion> plants { get; private set; }
 
         private static void getVehicleColliders(Transform vehicleRoot)
@@ -2548,226 +2744,5 @@ namespace practise
         //    Level.onPreLevelLoaded += new PreLevelLoaded(this.onLevelLoaded);
         //    Player.onPlayerCreated += new PlayerCreated(this.onPlayerCreated);
         //}
-
-        public static void load(string path)
-        {
-            bool flag = false;
-            //if (LevelSavedata.fileExists("/Barricades.dat") && Level.info.type == ELevelType.SURVIVAL)
-            //{
-            River river = new River(path, true, false, true);
-            BarricadeManager.version = river.readByte();
-            BarricadeManager.serverActiveDate = BarricadeManager.version <= (byte)6 ? Provider.time : river.readUInt32();
-            if (BarricadeManager.version > (byte)0)
-            {
-                for (byte index1 = 0; (int)index1 < (int)Regions.WORLD_SIZE; ++index1)
-                {
-                    for (byte index2 = 0; (int)index2 < (int)Regions.WORLD_SIZE; ++index2)
-                    {
-                        BarricadeRegion region = BarricadeManager.regions[(int)index1, (int)index2];
-                        BarricadeManager.loadRegion(BarricadeManager.version, river, region);
-                    }
-                }
-                if (BarricadeManager.version > (byte)1)
-                {
-                    if (BarricadeManager.version > (byte)13)
-                    {
-                        ushort num = river.readUInt16();
-                        for (ushort index = 0; (int)index < (int)num; ++index)
-                        {
-                            uint instanceID = river.readUInt32();
-                            BarricadeRegion region = BarricadeManager.getRegionFromVehicle(VehicleManager.getVehicle(instanceID));
-                            if (region == null)
-                            {
-                                CommandWindow.LogWarning((object)string.Format("Barricades associated with missing vehicle instance ID '{0}' were lost", (object)instanceID));
-                                region = BarricadeManager.regions[0, 0];
-                            }
-                            BarricadeManager.loadRegion(BarricadeManager.version, river, region);
-                        }
-                    }
-                    else
-                    {
-                        ushort num = (ushort)Mathf.Min((int)river.readUInt16(), BarricadeManager.plants.Count);
-                        for (int index = 0; index < (int)num; ++index)
-                        {
-                            BarricadeRegion plant = BarricadeManager.plants[index];
-                            BarricadeManager.loadRegion(BarricadeManager.version, river, plant);
-                        }
-                    }
-                }
-            }
-            //if (BarricadeManager.version < (byte)11)
-            //    flag = true;
-            //}
-            //else
-            //    flag = true;
-            //if (flag && LevelObjects.buildables != null)
-            //{
-            //    for (byte index1 = 0; (int)index1 < (int)Regions.WORLD_SIZE; ++index1)
-            //    {
-            //        for (byte index2 = 0; (int)index2 < (int)Regions.WORLD_SIZE; ++index2)
-            //        {
-            //            List<LevelBuildableObject> buildable = LevelObjects.buildables[(int)index1, (int)index2];
-            //            if (buildable != null && buildable.Count != 0)
-            //            {
-            //                BarricadeRegion region = BarricadeManager.regions[(int)index1, (int)index2];
-            //                for (int index3 = 0; index3 < buildable.Count; ++index3)
-            //                {
-            //                    LevelBuildableObject levelBuildableObject = buildable[index3];
-            //                    if (levelBuildableObject != null)
-            //                    {
-            //                        ItemBarricadeAsset asset = levelBuildableObject.asset as ItemBarricadeAsset;
-            //                        if (asset != null)
-            //                        {
-            //                            Vector3 eulerAngles = levelBuildableObject.rotation.eulerAngles;
-            //                            byte newAngle_X = MeasurementTool.angleToByte((float)(Mathf.RoundToInt(eulerAngles.x / 2f) * 2));
-            //                            byte newAngle_Y = MeasurementTool.angleToByte((float)(Mathf.RoundToInt(eulerAngles.y / 2f) * 2));
-            //                            byte newAngle_Z = MeasurementTool.angleToByte((float)(Mathf.RoundToInt(eulerAngles.z / 2f) * 2));
-            //                            Barricade newBarricade = new Barricade(asset.id, asset.health, asset.getState(), asset);
-            //                            BarricadeData barricadeData = new BarricadeData(newBarricade, levelBuildableObject.point, newAngle_X, newAngle_Y, newAngle_Z, 0UL, 0UL, uint.MaxValue);
-            //                            region.barricades.Add(barricadeData);
-            //                            //BarricadeManager.manager.spawnBarricade(region, newBarricade.id, newBarricade.state, barricadeData.point, barricadeData.angle_x, barricadeData.angle_y, barricadeData.angle_z, (byte)Mathf.RoundToInt((float)((double)newBarricade.health / (double)asset.health * 100.0)), 0UL, 0UL, ++BarricadeManager.instanceCount);
-            //                        }
-            //                    }
-            //                }
-            //            }
-            //        }
-            //    }
-            //}
-            Level.isLoadingBarricades = false;
-        }
-
-
-
-        private static void loadRegion(byte version, River river, BarricadeRegion region)
-        {
-            ushort num1 = river.readUInt16();
-            for (ushort index = 0; (int)index < (int)num1; ++index)
-            {
-                ushort num2 = river.readUInt16();
-                ushort newHealth = river.readUInt16();
-                byte[] numArray = river.readBytes();
-                Vector3 vector3 = river.readSingleVector3();
-                byte num3 = 0;
-                if (version > (byte)2)
-                    num3 = river.readByte();
-                byte num4 = river.readByte();
-                byte num5 = 0;
-                if (version > (byte)3)
-                    num5 = river.readByte();
-                ulong num6 = 0;
-                ulong num7 = 0;
-                if (version > (byte)4)
-                {
-                    num6 = river.readUInt64();
-                    num7 = river.readUInt64();
-                }
-                uint newObjActiveDate;
-                if (version > (byte)5)
-                {
-                    newObjActiveDate = river.readUInt32();
-                    if (Provider.time - BarricadeManager.serverActiveDate > Provider.modeConfigData.Barricades.Decay_Time / 2U)
-                        newObjActiveDate = Provider.time;
-                }
-                else
-                    newObjActiveDate = Provider.time;
-                ItemBarricadeAsset itemBarricadeAsset;
-                try
-                {
-                    itemBarricadeAsset = (ItemBarricadeAsset)Assets.find(EAssetType.ITEM, num2);
-                }
-                catch
-                {
-                    itemBarricadeAsset = (ItemBarricadeAsset)null;
-                }
-                if (itemBarricadeAsset != null)
-                {
-                    if (itemBarricadeAsset.type == EItemType.TANK && numArray.Length < 2)
-                        numArray = itemBarricadeAsset.getState(EItemOrigin.ADMIN);
-                    if (itemBarricadeAsset.build == EBuild.OIL && numArray.Length < 2)
-                        numArray = itemBarricadeAsset.getState(EItemOrigin.ADMIN);
-                    if (version < (byte)10)
-                    {
-                        Vector3 eulerAngles = BarricadeManager.getRotation(itemBarricadeAsset, (float)((int)num3 * 2), (float)((int)num4 * 2), (float)((int)num5 * 2)).eulerAngles;
-                        num3 = MeasurementTool.angleToByte((float)(Mathf.RoundToInt(eulerAngles.x / 2f) * 2));
-                        num4 = MeasurementTool.angleToByte((float)(Mathf.RoundToInt(eulerAngles.y / 2f) * 2));
-                        num5 = MeasurementTool.angleToByte((float)(Mathf.RoundToInt(eulerAngles.z / 2f) * 2));
-                    }
-                    region.barricades.Add(new BarricadeData(new Barricade(num2, newHealth, numArray, itemBarricadeAsset), vector3, num3, num4, num5, num6, num7, newObjActiveDate));
-                    //if (Provider.isServer)
-                       // BarricadeManager.manager.spawnBarricade(region, num2, numArray, vector3, num3, num4, num5, (byte)Mathf.RoundToInt((float)((double)newHealth / (double)itemBarricadeAsset.health * 100.0)), num6, num7, ++BarricadeManager.instanceCount);
-                }
-            }
-        }
-        public static void save(string path)
-        {
-            River river = new River(path, true, false, true);
-            river.writeByte(BarricadeManager.SAVEDATA_VERSION);
-            river.writeUInt32(Provider.time);
-            for (byte index1 = 0; (int)index1 < (int)Regions.WORLD_SIZE; ++index1)
-            {
-                for (byte index2 = 0; (int)index2 < (int)Regions.WORLD_SIZE; ++index2)
-                {
-                    BarricadeRegion region = BarricadeManager.regions[(int)index1, (int)index2];
-                    BarricadeManager.saveRegion(river, region);
-                }
-            }
-            ushort num = 0;
-            for (ushort plant = 0; (int)plant < BarricadeManager.plants.Count; ++plant)
-            {
-                InteractableVehicle vehicleFromPlant = BarricadeManager.getVehicleFromPlant(plant);
-                if ((UnityEngine.Object)vehicleFromPlant != (UnityEngine.Object)null && !vehicleFromPlant.isAutoClearable)
-                    ++num;
-            }
-            river.writeUInt16(num);
-            for (int index = 0; index < BarricadeManager.plants.Count; ++index)
-            {
-                InteractableVehicle vehicleFromPlant = BarricadeManager.getVehicleFromPlant((ushort)index);
-                if ((UnityEngine.Object)vehicleFromPlant != (UnityEngine.Object)null && !vehicleFromPlant.isAutoClearable)
-                {
-                    river.writeUInt32(vehicleFromPlant.instanceID);
-                    BarricadeManager.saveRegion(river, BarricadeManager.plants[index]);
-                }
-            }
-            river.closeRiver();
-        }
-        private static void saveRegion(River river, BarricadeRegion region)
-        {
-            uint time = Provider.time;
-            ushort num = 0;
-            for (ushort index = 0; (int)index < region.barricades.Count; ++index)
-            {
-                BarricadeData barricade = region.barricades[(int)index];
-                if ((!Dedicator.isDedicated || Provider.modeConfigData.Barricades.Decay_Time == 0U || (time < barricade.objActiveDate || time - barricade.objActiveDate < Provider.modeConfigData.Barricades.Decay_Time)) && barricade.barricade.asset.isSaveable)
-                    ++num;
-            }
-            river.writeUInt16(num);
-            for (ushort index = 0; (int)index < region.barricades.Count; ++index)
-            {
-                BarricadeData barricade = region.barricades[(int)index];
-                river.writeUInt16(barricade.barricade.id);
-                river.writeUInt16(barricade.barricade.health);
-                river.writeBytes(barricade.barricade.state);
-                river.writeSingleVector3(barricade.point);
-                river.writeByte(barricade.angle_x);
-                river.writeByte(barricade.angle_y);
-                river.writeByte(barricade.angle_z);
-                river.writeUInt64(barricade.owner);
-                river.writeUInt64(barricade.group);
-                river.writeUInt32(barricade.objActiveDate);
-                //if ((!Dedicator.isDedicated || Provider.modeConfigData.Barricades.Decay_Time == 0U || (time < barricade.objActiveDate || time - barricade.objActiveDate < Provider.modeConfigData.Barricades.Decay_Time)) && barricade.barricade.asset.isSaveable)
-                //{
-                //    river.writeUInt16(barricade.barricade.id);
-                //    river.writeUInt16(barricade.barricade.health);
-                //    river.writeBytes(barricade.barricade.state);
-                //    river.writeSingleVector3(barricade.point);
-                //    river.writeByte(barricade.angle_x);
-                //    river.writeByte(barricade.angle_y);
-                //    river.writeByte(barricade.angle_z);
-                //    river.writeUInt64(barricade.owner);
-                //    river.writeUInt64(barricade.group);
-                //    river.writeUInt32(barricade.objActiveDate);
-                //}
-            }
-        }
     }
 }
