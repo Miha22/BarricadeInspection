@@ -11,7 +11,7 @@ namespace practise
         static string path = $@"E:\Program Files (x86)\steam\steamapps\common\Unturned - Copy\Servers\test\Players\76561198112559333_0\Washington\Player\Clothing.dat";
         static string path2 = $@"E:\Program Files (x86)\steam\steamapps\common\Unturned - Copy\Servers\test\Players\76561198112559333_0\Washington\Clothing.dat";
         static string path3 = $@"E:\Program Files (x86)\steam\steamapps\common\Unturned - Copy\Servers\test\Players\76561198112559333_0\Washington\Player\Inventory.dat";
-        static string pathW = $@"E:\Program Files (x86)\steam\steamapps\common\Unturned - Copy\Servers\test\Level\Washington\Barricades.dat";
+        static string pathW = $@"E:\Program Files (x86)\steam\steamapps\common\Unturned\Servers\test\Level\Washington\Barricades.dat";
         //static string path4 = $@"E:\Program Files (x86)\steam\steamapps\common\Unturned - Copy\Servers\test\Level\Washington\Barricades.dat";
         static readonly string pathM = @"/Users/Test/Documents/Github/BarricadeManager/Barricades.dat";
         static void Main(string[] args)
@@ -24,7 +24,8 @@ namespace practise
             {
                 for (byte index2 = 0; index2 < 64; ++index2)
                 {
-                    Functions.loadRegion(river);
+                    //Functions.loadRegion(river);
+                    Functions.LoadRegion2(river);
                 }
             }
 
@@ -32,6 +33,44 @@ namespace practise
     }
     class Functions
     {
+        public static void LoadRegion2(River river)
+        {
+            //uint time = Provider.time;
+            //ushort num = 0;
+            //for (ushort index = 0; (int)index < region.barricades.Count; ++index)
+            //{
+            //    BarricadeData barricade = region.barricades[(int)index];
+            //    if ((!Dedicator.isDedicated || Provider.modeConfigData.Barricades.Decay_Time == 0U || (time < barricade.objActiveDate || time - barricade.objActiveDate < Provider.modeConfigData.Barricades.Decay_Time)) && barricade.barricade.asset.isSaveable)
+            //        ++num;
+            //}
+            ushort barricadesCount = river.readUInt16();
+            for (ushort index = 0; index < barricadesCount; ++index)
+            {
+                //river.writeUInt16(barricade.barricade.id);
+                Console.WriteLine($"id: {river.readUInt16()}");
+                //river.writeUInt16(barricade.barricade.health);
+                Console.WriteLine($"health: {river.readUInt16()}");
+                //river.writeBytes(barricade.barricade.state);
+                ushort counter = 0;
+                foreach (byte item in river.readBytes())
+                {
+                    Console.WriteLine($"{counter++}. {item}");
+                }
+                //river.writeSingleVector3(barricade.point);
+                Console.WriteLine($"single: {river.readSingle()}");
+                Console.WriteLine($"single: {river.readSingle()}");
+                Console.WriteLine($"single: {river.readSingle()}");
+                //river.writeByte(barricade.angle_x);
+                Console.WriteLine($"x: {river.readByte()}");
+                Console.WriteLine($"y: {river.readByte()}");
+                Console.WriteLine($"z: {river.readByte()}");
+                //river.writeUInt64(barricade.owner);
+                Console.WriteLine($"owner: {river.readUInt64()}");
+                Console.WriteLine($"group: {river.readUInt64()}");
+                Console.WriteLine($"obj activate date: {river.readUInt32()}");
+                Console.WriteLine();
+            }
+        }
         public static byte version = BarricadeManager.SAVEDATA_VERSION;
         public static void loadRegion(River river)
         {
@@ -66,6 +105,7 @@ namespace practise
                 uint newObjActiveDate = river.readUInt32();
             }
         }
+
         public static Block ReadBlock(string path, byte prefix)
         {
             return readBlock(ServerSavedata.directory + "/" + Provider.serverID + path, false, prefix);
